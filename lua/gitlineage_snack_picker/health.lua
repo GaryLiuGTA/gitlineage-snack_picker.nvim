@@ -3,7 +3,7 @@ local M = {}
 local health = vim.health
 
 M.check = function()
-	health.start("gitlineage.nvim")
+	health.start("gitlineage-snack_picker.nvim")
 
 	-- Check Neovim version
 	if vim.fn.has("nvim-0.7.0") == 1 then
@@ -28,28 +28,31 @@ M.check = function()
 		health.info("Current directory is not a git repository (gitlineage only works in git repos)")
 	end
 
+	-- Check snacks.nvim
+	local has_snacks, _ = pcall(require, "snacks")
+	if has_snacks then
+		health.ok("snacks.nvim found (required for picker)")
+	else
+		health.error("snacks.nvim not found (required)")
+		health.info("  Install from: https://github.com/folke/snacks.nvim")
+	end
+
 	-- Check optional dependency: diffview.nvim
 	local has_diffview, _ = pcall(require, "diffview")
 	if has_diffview then
-		health.ok("diffview.nvim found (open_diff feature available)")
+		health.ok("diffview.nvim found (Ctrl-D in picker to open diff)")
 	else
-		health.info("diffview.nvim not found (open_diff feature disabled)")
+		health.info("diffview.nvim not found (Ctrl-D action disabled)")
 		health.info("  Install from: https://github.com/sindrets/diffview.nvim")
 	end
 
 	-- Check configuration
-	local ok, gitlineage = pcall(require, "gitlineage")
+	local ok, gitlineage = pcall(require, "gitlineage_snack_picker")
 	if ok then
-		health.ok("gitlineage loaded")
-		health.info("split: " .. gitlineage.config.split)
+		health.ok("gitlineage_snack_picker loaded")
 		health.info("keymap: " .. (gitlineage.config.keymap or "disabled"))
-		health.info("keys.close: " .. (gitlineage.config.keys.close or "disabled"))
-		health.info("keys.next_commit: " .. (gitlineage.config.keys.next_commit or "disabled"))
-		health.info("keys.prev_commit: " .. (gitlineage.config.keys.prev_commit or "disabled"))
-		health.info("keys.yank_commit: " .. (gitlineage.config.keys.yank_commit or "disabled"))
-		health.info("keys.open_diff: " .. (gitlineage.config.keys.open_diff or "disabled"))
 	else
-		health.error("Failed to load gitlineage module")
+		health.error("Failed to load gitlineage_snack_picker module")
 	end
 end
 
